@@ -21,24 +21,29 @@ module.exports.hapiJwt2Key = (options) => {
   const client = new JwksClient(options);
   const onError = options.handleSigningKeyError || handleSigningKeyError;
 
-  return function secretProvider(decoded, cb) {
+  return async function secretProvider(decoded) {
     // We cannot find a signing certificate if there is no header (no kid).
     if (!decoded || !decoded.header) {
-      return cb(null, null, null);
+      return { key: false };
     }
 
     // Only RS256 is supported.
     if (decoded.header.alg !== 'RS256') {
-      return cb(null, null, null);
+      return { key: false };
     }
 
-    client.getSigningKey(decoded.header.kid, (err, key) => {
-      if (err) {
-        return onError(err, (newError) => cb(newError, null, null));
-      }
-
-      // Provide the key.
-      return cb(null, key.publicKey || key.rsaPublicKey, key);
+    var getSigningKeyPromise = new Promise((resolve, reject) => {
+      client.getSigningKey(decoded.header.kid, function (err, key) {
+        if (err) {
+          return onError(err, function (newError) {
+            reject({key: false, error: newError});
+          });
+        }
+  
+        // Provide the key.
+        return resolve({key: key.publicKey || key.rsaPublicKey});
+      });
     });
+    return getSigningKeyPromise;
   };
 };
