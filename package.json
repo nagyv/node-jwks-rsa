@@ -1,6 +1,6 @@
 {
-  "name": "jwks-rsa",
-  "version": "1.2.1",
+  "name": "@nagyv/jwks-rsa",
+  "version": "1.2.1-hapi17",
   "description": "Library to retrieve RSA public keys from a JWKS endpoint",
   "main": "lib/index.js",
   "types": "index.d.ts",
@@ -35,9 +35,9 @@
     "clean": "rimraf lib/",
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run clean && npm run compile",
-    "release": "git tag $npm_package_version && git push && git push --tags && npm publish"
     "test": "cross-env NODE_ENV=test mocha --compilers js:babel-core/register --timeout 5000 './tests/*.tests.js'",
     "test-watch": "cross-env NODE_ENV=test mocha --compilers js:babel-core/register --timeout 5000 --watch './tests/*.tests.js'",
+    "release": "npm publish --access=public"
   },
   "repository": {
     "type": "git",
